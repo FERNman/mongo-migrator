@@ -6,6 +6,7 @@
   "scripts": {
     "test": "jest",
     "build": "tsc --project tsconfig.lib.json",
+    "lint": "eslint .",
     "start": "ts-node bin/mongo-migrator.ts"
   },
   "bin": "dist/bin/mongo-migrator",
