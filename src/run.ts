@@ -1,8 +1,6 @@
 import { MongoClient } from 'mongodb';
 import { Config } from './config/config';
 import { DatabaseConfig } from './config/database-config';
-import { getAuthFromConfig } from './config/get-auth-from-config';
-import { getUrlFromConfig } from './config/get-url-from-config';
 import { getMigrationFiles } from './migrations/get-migration-files';
 import { loadMigration } from './migrations/load-migration';
 
@@ -10,12 +8,7 @@ import { loadMigration } from './migrations/load-migration';
  * Applies pending migrations for all databases.
  */
 export async function run(config: Config): Promise<void> {
-  const client = new MongoClient(getUrlFromConfig(config), {
-    auth: getAuthFromConfig(config),
-    useUnifiedTopology: true,
-    useNewUrlParser: true
-  });
-
+  const client = new MongoClient(config.url, config.mongoClientOptions);
   await client.connect();
 
   for (const database of config.databases) {

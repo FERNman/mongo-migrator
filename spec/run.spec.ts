@@ -18,14 +18,17 @@ describe('run', () => {
   });
 
   it('should apply the pending migrations', async () => {
-    const config: Config = {
-      url: database.uri,
-      databases: [{ name: 'Test', files: ['./spec/migrations/**/*'] }]
-    };
-
-    await run(config);
+    await run(getConfig(database));
 
     const collections = await database.db.listCollections().toArray();
-    expect(collections.map(c => c.name)).toEqual(['test']);
+    expect(collections.map(c => c.name)).toContain('test');
   });
 });
+
+function getConfig(database: TestDatabase): Config {
+  return {
+    url: database.uri,
+    mongoClientOptions: { useNewUrlParser: true, useUnifiedTopology: true },
+    databases: [{ name: 'Test', files: ['./spec/migrations/**/*'] }]
+  };
+}
