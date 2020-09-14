@@ -21,6 +21,8 @@ export async function run(config: Config): Promise<void> {
   for (const database of config.databases) {
     await runMigrations(client, database);
   }
+
+  await client.close();
 }
 
 async function runMigrations(client: MongoClient, config: DatabaseConfig): Promise<void> {
