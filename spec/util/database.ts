@@ -2,15 +2,23 @@ import { Db, MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 export class TestDatabase {
-  private client: MongoClient;
-  private _uri: string;
+  private connection: MongoClient | undefined;
+  private _uri: string | undefined;
   private readonly instance: MongoMemoryServer;
 
   public get db(): Db {
-    return this.client.db(this.name);
+    if (!this.connection) {
+      throw new Error('The database client is undefined. Did you forget to call `TestDatabase.start()`?');
+    }
+
+    return this.connection.db(this.name);
   }
 
   public get uri(): string {
+    if (!this._uri) {
+      throw new Error('The database URI is undefined. Did you forget to call `TestDatabase.start()`?');
+    }
+
     return this._uri;
   }
 
@@ -23,12 +31,14 @@ export class TestDatabase {
 
     this._uri = await this.instance.getUri();
 
-    this.client = new MongoClient(this._uri);
-    await this.client.connect();
+    this.connection = await MongoClient.connect(this._uri, { useUnifiedTopology: true, useNewUrlParser: true });
   }
 
   public async stop(): Promise<void> {
-    await this.client.close();
+    if (this.connection) {
+      await this.connection.close();
+    }
+
     await this.instance.stop();
   }
 

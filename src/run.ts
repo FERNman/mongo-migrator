@@ -10,7 +10,12 @@ import { loadMigration } from './migrations/load-migration';
  * Applies pending migrations for all databases.
  */
 export async function run(config: Config): Promise<void> {
-  const client = new MongoClient(getUrlFromConfig(config), { auth: getAuthFromConfig(config) });
+  const client = new MongoClient(getUrlFromConfig(config), {
+    auth: getAuthFromConfig(config),
+    useUnifiedTopology: true,
+    useNewUrlParser: true
+  });
+
   await client.connect();
 
   for (const database of config.databases) {
