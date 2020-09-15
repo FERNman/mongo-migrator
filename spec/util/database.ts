@@ -1,4 +1,4 @@
-import { Db, MongoClient } from 'mongodb';
+import { Db, FilterQuery, MongoClient } from 'mongodb';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 
 export class TestDatabase {
@@ -44,5 +44,16 @@ export class TestDatabase {
 
   public async reset(): Promise<void> {
     await this.db.dropDatabase();
+  }
+
+  public async insertData(data: { [collection: string]: unknown[] }): Promise<void> {
+    const collections = Object.keys(data);
+    for (const collection of collections) {
+      await this.db.collection(collection).insertMany(data[collection]);
+    }
+  }
+
+  public async getDocument<T = unknown>(collectionName: string, where: FilterQuery<T>): Promise<T | null> {
+    return this.db.collection<T>(collectionName).findOne(where);
   }
 }

@@ -1,14 +1,14 @@
 import glob from 'glob';
-import path from 'path';
+import { Migration } from './migration';
 
-export async function getMigrationFiles(files: string[]): Promise<string[]> {
+export async function loadMigrations(from: string[]): Promise<Migration[]> {
   let migrationFiles: string[] = [];
-  for (const pattern of files) {
+  for (const pattern of from) {
     const matchedFiles = await asyncGlob(pattern);
     migrationFiles = migrationFiles.concat(matchedFiles);
   }
 
-  return migrationFiles.map(file => path.resolve(process.cwd(), file));
+  return Promise.all(migrationFiles.map(file => Migration.fromFile(file)));
 }
 
 function asyncGlob(pattern: string): Promise<string[]> {
