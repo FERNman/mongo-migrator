@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { Config } from '../src/config/config';
 import { AppliedMigration } from '../src/migrations/applied-migration';
 import { run } from '../src/run';
-import { TestDatabase } from './util/database';
+import { TestDatabase } from './util/test-database';
 
 describe('run', () => {
   const database = new TestDatabase('Test');
@@ -41,6 +41,42 @@ describe('run', () => {
     });
 
     await run(getConfig(database));
+
+    const collections = await database.db.listCollections().toArray();
+    expect(collections.map(c => c.name)).not.toContain('test');
+  });
+
+  it('should not apply the same migration twice', async () => {
+    await run(getConfig(database));
+    let documentCount = await database.db.collection('test').countDocuments();
+    expect(documentCount).toEqual(1);
+
+    await run(getConfig(database));
+
+    documentCount = await database.db.collection('test').countDocuments();
+    expect(documentCount).toEqual(1);
+  });
+
+  it('should respect the provided migrations collection', async () => {
+    const collection = 'changelog';
+    const config = {
+      ...getConfig(database),
+      databases: [{ name: 'Test', files: ['./spec/migrations/**/*'], migrationsCollection: collection }]
+    };
+
+    await run(config);
+
+    const collections = await database.db.listCollections().toArray();
+    expect(collections.map(c => c.name)).toContain(collection);
+  });
+
+  it('should not do anything if there are no migrations', async () => {
+    const config = {
+      ...getConfig(database),
+      databases: [{ name: 'Test' }]
+    };
+
+    await run(config);
 
     const collections = await database.db.listCollections().toArray();
     expect(collections.map(c => c.name)).not.toContain('test');
