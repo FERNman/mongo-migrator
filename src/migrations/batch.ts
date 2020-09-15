@@ -1,7 +1,7 @@
-import { DatabaseConnection } from '../database-connection';
-import { loadMigrations } from './load-migrations';
+import { DatabaseConnection } from '../helpers/database-connection';
+import { loadMigrations } from '../helpers/load-migrations';
+import { MigrationStatus } from '../types/migration-status';
 import { Migration } from './migration';
-import { MigrationStatus } from './migration-status';
 
 export class Batch {
   public static async fromFiles(files: string[]): Promise<Batch> {

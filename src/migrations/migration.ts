@@ -1,7 +1,7 @@
 import path from 'path';
-import { DatabaseConnection } from '../database-connection';
-import { MigrationFile } from './migration-file';
-import { MigrationStatus } from './migration-status';
+import { DatabaseConnection } from '../helpers/database-connection';
+import { MigrationFile } from '../types/migration-file';
+import { MigrationStatus } from '../types/migration-status';
 
 export class Migration {
   private get name(): string {

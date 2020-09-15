@@ -1,5 +1,5 @@
 import glob from 'glob';
-import { Migration } from './migration';
+import { Migration } from '../migrations/migration';
 
 export async function loadMigrations(from: string[]): Promise<Migration[]> {
   let migrationFiles: string[] = [];

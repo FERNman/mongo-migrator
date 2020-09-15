@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { Config } from '../src/config/config';
-import { AppliedMigration } from '../src/migrations/applied-migration';
 import { run } from '../src/run';
+import { AppliedMigration } from '../src/types/applied-migration';
 import { TestDatabase } from './util/test-database';
 
 describe('run', () => {

@@ -1,6 +1,6 @@
 import { Config } from './config/config';
 import { DatabaseConfig } from './config/database-config';
-import { DatabaseConnection } from './database-connection';
+import { DatabaseConnection } from './helpers/database-connection';
 import { Batch } from './migrations/batch';
 
 /**

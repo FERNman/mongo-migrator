@@ -1,6 +1,6 @@
 import { Collection, Db, MongoClient, MongoClientOptions } from 'mongodb';
-import { DatabaseConfig } from './config/database-config';
-import { AppliedMigration } from './migrations/applied-migration';
+import { DatabaseConfig } from '../config/database-config';
+import { AppliedMigration } from '../types/applied-migration';
 
 export class DatabaseConnection {
   public static async connect(
