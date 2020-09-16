@@ -1,3 +1,7 @@
 export * from './config/config';
 export * from './config/database-config';
-export { run } from './run';
+export { migrate } from './migrate';
+export { rollback } from './rollback';
+export * from './types/changelog';
+export * from './types/migration-file';
+export * from './types/migration-status';
