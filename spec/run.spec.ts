@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { Config } from '../src/config/config';
 import { run } from '../src/run';
-import { AppliedMigration } from '../src/types/applied-migration';
+import { ChangelogEntry } from '../src/types/applied-migration';
 import { TestDatabase } from './util/test-database';
 
 describe('run', () => {
@@ -29,15 +29,15 @@ describe('run', () => {
   it('should add applied migrations to the database', async () => {
     await run(getConfig(database));
 
-    const appliedMigration = await database.getDocument<AppliedMigration>('migrations', {
-      name: 'create-test-collection'
+    const appliedMigration = await database.getDocument<ChangelogEntry>('changelog', {
+      migrations: 'create-test-collection'
     });
     expect(appliedMigration).toBeTruthy();
   });
 
   it('should not run previously applied migrations', async () => {
     await database.insertData({
-      migrations: [{ _id: new ObjectId(), date: new Date(), name: 'create-test-collection' }] as AppliedMigration[]
+      changelog: [{ _id: new ObjectId(), date: new Date(), migrations: ['create-test-collection'] }] as ChangelogEntry[]
     });
 
     await run(getConfig(database));
@@ -58,10 +58,10 @@ describe('run', () => {
   });
 
   it('should respect the provided migrations collection', async () => {
-    const collection = 'changelog';
-    const config = {
+    const collection = 'migrations';
+    const config: Config = {
       ...getConfig(database),
-      databases: [{ name: 'Test', files: ['./spec/migrations/**/*'], migrationsCollection: collection }]
+      databases: [{ name: 'Test', files: ['./spec/migrations/**/*'], changelog: collection }]
     };
 
     await run(config);
@@ -71,7 +71,7 @@ describe('run', () => {
   });
 
   it('should not do anything if there are no migrations', async () => {
-    const config = {
+    const config: Config = {
       ...getConfig(database),
       databases: [{ name: 'Test' }]
     };
@@ -80,6 +80,17 @@ describe('run', () => {
 
     const collections = await database.db.listCollections().toArray();
     expect(collections.map(c => c.name)).not.toContain('test');
+  });
+
+  it('should not alter the changelog if there are no pending migrations', async () => {
+    await database.insertData({
+      changelog: [{ _id: new ObjectId(), date: new Date(), migrations: ['create-test-collection'] }] as ChangelogEntry[]
+    });
+
+    await run(getConfig(database));
+
+    const changelogLength = await database.db.collection<ChangelogEntry>('changelog').countDocuments();
+    expect(changelogLength).toEqual(1);
   });
 });
 

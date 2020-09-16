@@ -4,7 +4,7 @@ import { MigrationFile } from '../types/migration-file';
 import { MigrationStatus } from '../types/migration-status';
 
 export class Migration {
-  private get name(): string {
+  public get name(): string {
     return path.basename(this.filename).replace(/\.[^/.]+$/, '');
   }
 
@@ -28,11 +28,10 @@ export class Migration {
 
   public async up(connection: DatabaseConnection): Promise<void> {
     await this.file.up(connection.db);
-    await connection.migrationsCollection.insertOne({ name: this.name, date: new Date() });
   }
 
   public async getStatus(connection: DatabaseConnection): Promise<MigrationStatus> {
-    const document = await connection.migrationsCollection.findOne({ name: this.name });
+    const document = await connection.changelog.findOne({ migrations: this.name });
     if (document) {
       return MigrationStatus.Applied;
     }

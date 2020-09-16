@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 
-export interface AppliedMigration {
+export interface ChangelogEntry {
   _id: ObjectId;
-  name: string;
   date: Date;
+  migrations: string[];
 }

@@ -12,7 +12,7 @@ export interface DatabaseConfig {
 
   /**
    * The name of the collection where we keep track of already applied migrations.
-   * Defaults to `migrations`.
+   * Defaults to `changelog`.
    */
-  migrationsCollection?: string;
+  changelog?: string;
 }

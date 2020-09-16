@@ -1,7 +1,6 @@
 import { Config } from './config/config';
 import { DatabaseConfig } from './config/database-config';
-import { DatabaseConnection } from './helpers/database-connection';
-import { Batch } from './migrations/batch';
+import { Database } from './migrations/database';
 
 /**
  * Applies pending migrations for all databases.
@@ -13,10 +12,6 @@ export async function run(config: Config): Promise<void> {
 }
 
 async function runMigrations(config: Config, dbConfig: DatabaseConfig): Promise<void> {
-  const connection = await DatabaseConnection.connect(config.url, config.mongoClientOptions || {}, dbConfig);
-
-  const batch = await Batch.fromFiles(dbConfig.files || [`${dbConfig.name}/*`]);
-  await batch.up(connection);
-
-  await connection.close();
+  const database = new Database({ url: config.url, config: config.mongoClientOptions }, dbConfig);
+  await database.migrate();
 }
